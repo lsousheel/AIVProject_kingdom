@@ -1,23 +1,63 @@
 # Kingdom Wars: Interactive Army Battle Simulator
 
-**“We explore how different A*-based navigation strategies interact with Boids-based local swarm behavior in a 3D battlefield.”**
+**[Play the live game](https://kingdom-wars-theta.vercel.app/)** · **[GitHub repository](https://github.com/lsousheel/AIVProject_kingdom)**
 
-An existing plain JavaScript / Three.js / Vite project, extended into a siege scenario. Blue is an attacking force deployed in an open staging area. There is one Red castle, defended by 34 preset soldiers. The core academic systems remain our custom A* and Boids.
+A browser-based 3D army battle simulator built for a computer graphics / visual computing course using JavaScript, Three.js, and Vite. Build a Blue army, choose formations, draw movement routes, and fight 34 Red defenders around a castle. The two main pillars are **A* pathfinding** and **Boids group movement**.
 
-## Run
+![Kingdom Wars battlefield and Red Keep](docs/polished-overview.jpg)
+
+## Features
+
+- Warriors, Berserkers, and Guards with different route preferences and combat statistics.
+- Instant formation previews and independent orders for each soldier category.
+- Freehand route guidance with obstacle detours calculated by A*.
+- Group movement through narrow bridges, forests, and village alleys.
+- Reactive defenders, melee combat, health bars, and battle outcomes.
+- Algorithm View with route comparisons, search overlays, steering arrows, and six combat-free movement experiments.
+- A five-scene royal briefing with skip/replay controls and a cinematic battlefield reveal.
+
+## Run locally in VS Code
+
+Install Node.js **20.19+ within Node 20, or 22.12+**, with npm. Use a desktop browser with WebGL support. No backend, database, API keys, or environment variables are required.
+
+For a fresh checkout:
 
 ```sh
-npm install
+git clone https://github.com/lsousheel/AIVProject_kingdom.git
+cd AIVProject_kingdom
+npm ci
 npm run dev
-npm test
-npm run build
 ```
 
-Open Vite's printed local URL. For Vercel, use the Vite preset, build command `npm run build`, output `dist`. No backend or environment variables are needed. The production build has a non-blocking size advisory for the Three.js-containing JavaScript chunk.
+If you already have the project, open its folder in VS Code and run `npm ci` and `npm run dev` in **Terminal > New Terminal**. Open Vite's printed URL, usually `http://localhost:5173/`. Keep the terminal running; press **Ctrl+C** to stop it. Serve the project through Vite rather than opening `index.html` directly or using the Live Server extension.
+
+| Command | Purpose |
+| --- | --- |
+| `npm ci` | Install dependencies from the lockfile |
+| `npm run dev` | Start the development server |
+| `npm test` | Run automated tests |
+| `npm run build` | Build the production site into `dist/` |
+| `npm run preview` | Preview the production site after building |
+
+## First battle
+
+1. Finish the briefing or click **Skip tutorial**.
+2. Add troops using the bottom cards, or choose **Balanced 30**. Pick a formation; soldiers appear immediately.
+3. Click **Start War**. Soldiers wait for your orders.
+4. Select a troop card, a Blue soldier, or **All groups**.
+5. Right-click a destination, or left-drag a route on the ground and release.
+6. Move toward the Red Keep. Defenders react when attackers approach. Use **Battle view** to find the fighting.
+7. Defeat all Red defenders to win. Castle destruction is not required.
+
+## Deployment
+
+The game is live at **https://kingdom-wars-theta.vercel.app/**. To deploy your own copy on Vercel, import the GitHub repository, choose the **Vite** preset, use `npm run build` as the build command, and set the output directory to `dist`. No environment variables are needed.
+
+The production build has a non-blocking size advisory for the JavaScript chunk containing Three.js.
 
 ## Quick demonstration
 
-1. Click **Compare three routes** before deploying. All three searches use identical endpoints, making cost-profile differences easy to explain.
+1. Open **Algorithm View**, then click **Compare three routes** during preparation. All three searches use identical endpoints, making cost-profile differences easy to explain.
 2. Inspect the colored lines and per-class length, estimated cost, crossing, terrain and expansion metrics in the left sidebar. Toggle individual routes, explored cells and waypoint markers.
 3. Click the bottom troop cards to add units. Use the small minus controls to remove them. **Balanced 30** quickly fills 10 of each class.
 4. Choose Compact block, Line or Wide ranks. Soldiers appear immediately and update when troops or formation change. **Reposition** is optional.
@@ -126,7 +166,7 @@ Restricting cohesion and alignment to route groups prevents Guards from being pu
 | --- | ---: | ---: | ---: | ---: |
 | Warrior | 1.00 | 1.00 | 1.00 | 1.00 |
 | Berserker | 0.95 | 0.75 | 0.90 | 1.15 |
-| Guard | 1.10 | 1.15 | 1.10 | 1.00 |
+| Guard | 1.10 | 1.15 | 1.10 | 0.95 |
 
 Base separation/cohesion/alignment/target weights remain 2.4 / 0.35 / 0.65 / 2.2. Desired velocity uses class speed; acceleration is clamped. Forces are computed from a common state snapshot before integrating a fixed 1/60-second simulation step.
 
@@ -232,7 +272,7 @@ Keep world size divisible by cell size. If obstacles are changed dynamically, re
 
 ## Validation and limits
 
-`npm test` runs 32 tests: automatic formation display, soft sketch guidance, loop prevention, A* obstacle detours, river crossings and endpoint adjustment, stable defender orders, pursuit progress, line-of-sight grace, manual battle start/Red response and class-specific combat disengagement, river occupancy, bridge compression/re-expansion, swarm-lab restoration, discounted-road optimality, scenery construction, original navigation regressions, profile route differences, clearance preference, group-isolated orders, both armies completing profile routes, local Boids stability, placement, fixed defenders, state locking, health/death, and complete victories/defeats. See `docs/VALIDATION.md` for measured results and browser checks.
+`npm test` passes all **45 tests** (verified November 3, 2026). Coverage includes briefing and camera transitions, algorithm demos, metrics, class selection, and these gameplay checks: automatic formation display, soft sketch guidance, loop prevention, A* obstacle detours, river crossings and endpoint adjustment, stable defender orders, pursuit progress, line-of-sight grace, manual battle start/Red response and class-specific combat disengagement, river occupancy, bridge compression/re-expansion, swarm-lab restoration, discounted-road optimality, scenery construction, original navigation regressions, profile route differences, clearance preference, group-isolated orders, both armies completing profile routes, local Boids stability, placement, fixed defenders, state locking, health/death, and complete victories/defeats. See `docs/VALIDATION.md` for measured results and browser checks.
 
 Current limits:
 - Balance is illustrative. The tested 30-Berserker southern flank attack wins; a direct approach can lose. No claim of competitive balance is made. Survivors separated by walls may require another player order.
@@ -244,23 +284,38 @@ Current limits:
 - Desktop controls; the compact layout is not a complete mobile/touch experience.
 - O(n²) neighbor checks and a linear A* frontier remain suitable for this roughly 64-unit scope. FPS varies by view, GPU, overlays and active browser tabs.
 - Navigation remains planar. Shore margins are conservative cell approximations; route clearance is distance to blocked-cell centers. The narrow bridge has two usable grid rows.
-- Ambient scenery is merged/instanced (45 environment mesh objects, about 23.6k triangles before units/debug); rendering still depends on device and view.
+- Ambient scenery is merged/instanced (97 environment mesh objects, about 56.1k triangles before units/debug); rendering still depends on device and view.
 - Google Fonts is optional; system fonts provide an offline fallback.
 
 Recommended next improvements: a cost/clearance heatmap, editable profile sliders with a controlled comparison benchmark, explicit retreat orders and battle balance. Profile performance before adding a heap or spatial hash.
 
-Prior versions are preserved in `baseline-navigation-backup.zip`, `baseline-battle-backup.zip` and `baseline-environment-backup.zip` (the complete pre-environment phase).
+
 
 
 ## Visual polish
 
 The October 12 scene update adds warm lighting, layered terrain, animated river shading, richer crossings, a taller Red Keep, props, clustered forests and clearer soldier accents. Gameplay and navigation are preserved. See [the visual polish report](docs/VISUAL_POLISH.md) for files, verification, performance and limitations.
-# Algorithm presentation tools
+## Algorithm presentation tools
 
 Use **Algorithm View** for route comparison, search overlays, live Boids inspection and six combat-free movement presets. See [the presentation guide](docs/ALGORITHM_DEMO.md) for a live-demo walkthrough, implementation details and limitations.
 
-# Royal briefing
+## Royal briefing
 
 Every fresh load opens the Blue King's five-scene briefing. **Skip tutorial** and **Begin the siege** share a cinematic battlefield reveal. Use **Replay briefing** in the toolbar to view it again. See [the briefing report](docs/ROYAL_BRIEFING.md).
 
-"# AIVProject_kingdom" 
+
+
+## Documentation
+
+- [Algorithm demos and presentation walkthrough](docs/ALGORITHM_DEMO.md)
+- [Navigation and gameplay validation](docs/VALIDATION.md)
+- [Visual polish and rendering notes](docs/VISUAL_POLISH.md)
+- [Royal briefing implementation](docs/ROYAL_BRIEFING.md)
+- [Controls and deployment fixes](docs/CONTROLS_FIX.md)
+- [Enemy movement notes](docs/ENEMY_MOVEMENT.md)
+
+These reports record individual development phases. The current source and tests are the reference for present behaviour.
+
+## Technology
+
+JavaScript ES modules, Three.js, Vite, HTML/CSS, and Node.js's built-in test runner. The project implements its own navigation, formations, movement, and combat. Battlefield and soldier models use procedural geometry; the royal briefing uses a supplied king illustration.
