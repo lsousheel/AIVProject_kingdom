@@ -41,6 +41,10 @@ If you already have the project, open its folder in VS Code and run `npm ci` and
 
 ## First battle
 
+**Assignment 5 Beta:** During battle, select a class or all groups and change **March spacing** in the left panel. Loose ranks notice nearby teammates farther away and pull together less strongly. Changing the order keeps the current route and destination. Route-following still takes priority on sketches and near obstacles. Select Standard ranks to restore the class defaults.
+
+Download the [tested Beta build](releases/kingdom-wars-beta.zip). Extract it and serve the extracted folder as the site root with any static HTTP server (for example, run `npx serve .` inside the extracted folder).
+
 1. Finish the briefing or click **Skip tutorial**.
 2. Add troops using the bottom cards, or choose **Balanced 30**. Pick a formation; soldiers appear immediately.
 3. Click **Start War**. Soldiers wait for your orders.
@@ -272,7 +276,7 @@ Keep world size divisible by cell size. If obstacles are changed dynamically, re
 
 ## Validation and limits
 
-`npm test` passes all **45 tests** (verified November 3, 2026). Coverage includes briefing and camera transitions, algorithm demos, metrics, class selection, and these gameplay checks: automatic formation display, soft sketch guidance, loop prevention, A* obstacle detours, river crossings and endpoint adjustment, stable defender orders, pursuit progress, line-of-sight grace, manual battle start/Red response and class-specific combat disengagement, river occupancy, bridge compression/re-expansion, swarm-lab restoration, discounted-road optimality, scenery construction, original navigation regressions, profile route differences, clearance preference, group-isolated orders, both armies completing profile routes, local Boids stability, placement, fixed defenders, state locking, health/death, and complete victories/defeats. See `docs/VALIDATION.md` for measured results and browser checks.
+`npm test` passes all **46 tests** (verified November 12, 2026). Coverage includes briefing and camera transitions, algorithm demos, metrics, class selection, and these gameplay checks: automatic formation display, soft sketch guidance, loop prevention, A* obstacle detours, river crossings and endpoint adjustment, stable defender orders, pursuit progress, line-of-sight grace, manual battle start/Red response and class-specific combat disengagement, river occupancy, bridge compression/re-expansion, swarm-lab restoration, discounted-road optimality, scenery construction, original navigation regressions, profile route differences, clearance preference, group-isolated orders, both armies completing profile routes, local Boids stability, placement, fixed defenders, state locking, health/death, and complete victories/defeats. See `docs/VALIDATION.md` for measured results and browser checks.
 
 Current limits:
 - Balance is illustrative. The tested 30-Berserker southern flank attack wins; a direct approach can lose. No claim of competitive balance is made. Survivors separated by walls may require another player order.

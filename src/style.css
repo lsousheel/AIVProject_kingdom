@@ -744,3 +744,6 @@ footer {
   .map-caption b { font-size: 12px; }
   .map-caption span { display: none; }
 }
+.rank-order { padding: .65rem 0; border-top: 1px solid #516060; }
+.rank-order label { display: block; margin-bottom: .35rem; color: #ecd5a5; font-weight: 600; }
+.rank-order select { width: 100%; padding: .4rem; background: #243638; color: #f5ebd3; border: 1px solid #70817d; }

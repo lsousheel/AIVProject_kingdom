@@ -13,7 +13,7 @@ export function updateBoids(soldiers, grid, dt) {
     const profile = BOID_PROFILES[s.unitType] ?? BOID_PROFILES.warrior;
     const weights = {
       separation: C.separationWeight * profile.separation,
-      cohesion: C.cohesionWeight * profile.cohesion,
+      cohesion: C.cohesionWeight * profile.cohesion * (s.looseRanks ? 0.55 : 1),
       alignment: C.alignmentWeight * profile.alignment,
       target: C.targetWeight * profile.target,
     };
@@ -36,7 +36,7 @@ export function updateBoids(soldiers, grid, dt) {
           alignment.add(other.velocity);
           count++;
         }
-        if (d < C.separationRadius && d > 0.001)
+        if (d < C.separationRadius * (s.looseRanks ? 1.6 : 1) && d > 0.001)
           separation.addScaledVector(
             new THREE.Vector3().subVectors(s.position, other.position),
             1 / (d * d),

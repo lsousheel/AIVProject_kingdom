@@ -42,6 +42,9 @@ export class UIManager {
         <div class="defense-notes"><span>Warriors <b>Middle line</b></span><span>Berserkers <b>Southern flank</b></span><span>Guards <b>Castle entrance</b></span></div>
         <div class="selection-line"><small>SELECTED GROUP</small><b id="selection">Not deployed</b></div>
         <p id="status" class="status" role="status"></p>
+        <div id="rank-order" class="rank-order" hidden><label for="rank-spacing">March spacing</label>
+          <select id="rank-spacing"><option value="normal">Standard ranks</option><option value="loose">Loose ranks</option><option value="mixed" disabled>Mixed ranks</option></select>
+          <p class="muted">Loose ranks give nearby troops more room while marching. Your route stays the same.</p></div>
         <div id="academic-tools" hidden><p class="muted">GLOBAL PLANNING<br>A* decides where the group goes.<br>LOCAL MOVEMENT<br>Boids determines how soldiers move.</p><button id="compare">Compare three routes</button>
         <table id="comparison" class="comparison" hidden><caption>Same start · same destination</caption><thead><tr><th>Profile</th><th>Distance</th><th>Cost</th><th>Nodes</th></tr></thead><tbody id="comparison-body"></tbody></table>
         <div class="lab-controls"><small>SWARM LAB · NO COMBAT</small><div class="button-pair"><button id="bridgeDemo">Narrow bridge</button><button id="ruinsDemo">Village alley</button></div><button id="exitDemo" hidden>Return to preparation</button></div>
@@ -160,6 +163,10 @@ export class UIManager {
     ])
       document.getElementById(id).onchange = (e) =>
         actions.toggle(id, e.target.checked);
+    document.getElementById("rank-spacing").onchange = e => {
+      game.setRankSpacing(e.target.value === "loose");
+      this.update();
+    };
     this.inspector = new AlgorithmInspector(game, actions);
     this.update();
   }
@@ -174,6 +181,15 @@ export class UIManager {
       : g.phase === "DEMONSTRATION"
         ? "DEMO · NO COMBAT"
         : g.phase;
+    const ranks = document.getElementById("rank-order");
+    ranks.hidden = g.phase !== "BATTLE" || !g.blue?.selected;
+    if (!ranks.hidden) {
+      const members = g.blue.members(g.blue.selectedGroup);
+      const loose = members.filter(s => s.looseRanks).length;
+      const input = document.getElementById("rank-spacing");
+      input.disabled = !members.length;
+      input.value = !loose ? "normal" : loose === members.length ? "loose" : "mixed";
+    }
     document.getElementById("prep-actions").hidden = !prep;
     document.getElementById("battle-actions").hidden = prep;
     document.getElementById("compare").hidden = !prep;

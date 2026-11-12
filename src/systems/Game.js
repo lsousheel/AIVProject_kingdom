@@ -147,6 +147,13 @@ export class Game {
     this.previewPaths = restore.previewPaths;
     this.message = "Swarm lab complete. Your preparation has been restored.";
   }
+  setRankSpacing(loose) {
+    if (this.phase !== "BATTLE" || !this.blue?.selected) return false;
+    const group = this.blue.members(this.blue.selectedGroup);
+    if (!group.length) return false;
+    for (const soldier of group) soldier.looseRanks = loose;
+    return true;
+  }
   command(destination, { attackMove = false, trace = null } = {}) {
     if (
       !["BATTLE", "DEMONSTRATION"].includes(this.phase) ||
