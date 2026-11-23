@@ -136,6 +136,8 @@ export function updateBoids(soldiers, grid, dt) {
       .addScaledVector(desired, C.obstacleProbeTime);
     if (!grid.segmentClear(s.position, probe))
       desired.copy(direction).multiplyScalar(speed);
+    // Recovery must not override a queue and push into the soldier ahead.
+    if (s.trafficSpeed != null) desired.copy(direction).multiplyScalar(s.trafficSpeed);
     const steering = desired.sub(s.velocity).clampLength(0, C.acceleration);
     s.debugSteering.copy(steering);
     return steering;
@@ -149,6 +151,7 @@ export function updateBoids(soldiers, grid, dt) {
     s.velocity
       .addScaledVector(forces[i], dt)
       .clampLength(0, s.movementSpeed ?? C.speed);
+    if (s.trafficSpeed != null) s.velocity.clampLength(0, s.trafficSpeed);
     const next = s.position.clone().addScaledVector(s.velocity, dt);
     if (grid.segmentClear(s.position, next)) s.position.copy(next);
     else s.velocity.set(0, 0, 0);

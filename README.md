@@ -334,3 +334,7 @@ These reports record individual development phases. The current source and tests
 ## Technology
 
 JavaScript ES modules, Three.js, Vite, HTML/CSS, and Node.js's built-in test runner. The project implements its own navigation, formations, movement, and combat. Battlefield and soldier models use procedural geometry; the royal briefing uses a supplied king illustration.
+
+### Congestion-aware marching
+
+In narrow areas, soldiers match the speed of a teammate ahead instead of pushing. A sustained slowdown can trigger a local A* detour: estimated travel time plus occupancy delay must improve substantially before switching. Detours rejoin the existing route and preserve the destination slot. Searches are limited to one per army per second. Queue waits are bounded, and combat pursuit and final arrival use the existing movement logic. This is a local heuristic, not a global fastest-route guarantee or a solution to every opposing-traffic jam.

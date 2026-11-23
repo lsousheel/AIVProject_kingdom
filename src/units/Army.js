@@ -6,6 +6,7 @@ import { updateBoids } from "../systems/BoidsSystem.js";
 import { formationPositions } from "../systems/DeploymentSystem.js";
 import { CONFIG, BLUE_START, PATH_PROFILES } from "../config.js";
 import { groupMetrics } from '../navigation/PresentationMetrics.js';
+import { TrafficSystem } from '../systems/TrafficSystem.js';
 
 export class Army {
   constructor(scene, grid, options = {}) {
@@ -41,6 +42,7 @@ export class Army {
     this.selectedGroup = null;
     this.runs = {};
     this.metricsTimer = 0;
+    this.traffic = new TrafficSystem();
   }
   get active() {
     return this.soldiers.filter((s) => s.alive);
@@ -158,6 +160,10 @@ export class Army {
       s.orderDestination = s.route.at(-1).clone();
       s.progressPosition = s.position.clone();
       s.progressTimer = 0;
+      s.trafficWait = 0;
+      s.trafficSpeed = null;
+      s.trafficRelease = 0;
+      s.trafficQueued = 0;
       s.recoveryTime = 0;
       s.repairCooldown = 0;
       s.moveOnly = !attackMove;
@@ -177,6 +183,7 @@ export class Army {
     return this.path;
   }
   update(dt) {
+    this.traffic.update(this.active, this.grid, dt);
     updateBoids(this.active, this.grid, dt);
     this.metricsTimer += dt;
     for (const [type, run] of Object.entries(this.runs)) {
@@ -196,6 +203,7 @@ export class Army {
     if (this.metricsTimer >= 0.25) this.metricsTimer = 0;
   }
   reset() {
+    this.traffic = new TrafficSystem();
     this.runs = {};
     this.soldiers.forEach((s, i) => {
       const p = this.initialPositions[i];
@@ -219,6 +227,10 @@ export class Army {
       s.recoveryTime = 0;
       s.repairCooldown = 0;
       s.progressPosition = null;
+      s.trafficWait = 0;
+      s.trafficSpeed = null;
+      s.trafficRelease = 0;
+      s.trafficQueued = 0;
       s.debugForces = null;
       s.sync();
     });
