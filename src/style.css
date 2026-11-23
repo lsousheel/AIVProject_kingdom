@@ -747,3 +747,7 @@ footer {
 .rank-order { padding: .65rem 0; border-top: 1px solid #516060; }
 .rank-order label { display: block; margin-bottom: .35rem; color: #ecd5a5; font-weight: 600; }
 .rank-order select { width: 100%; padding: .4rem; background: #243638; color: #f5ebd3; border: 1px solid #70817d; }
+#level-generator { margin-bottom: 1rem; }
+#level-generator label { display: block; font-size: .8rem; margin-top: .6rem; }
+#level-generator input, #level-generator select { width: 100%; padding: .45rem; margin: .3rem 0; background: #243638; color: #f5ebd3; border: 1px solid #70817d; }
+#level-generator button { margin-top: .4rem; }

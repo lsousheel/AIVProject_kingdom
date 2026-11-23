@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Kingdom Wars · Private feedback</title></head>
+<body><main>
+<header><small>KINGDOM WARS / PLAYTEST STUDY</small><h1>Private feedback</h1><a href="/">Back to game</a></header>
+<p id="admin-status" role="status" aria-live="polite"></p>
+<form id="admin-login"><h2>Administrator sign-in</h2>
+<label>Email<input name="email" type="email" required autocomplete="username" maxlength="254"></label>
+<label>Password<input name="password" type="password" required autocomplete="current-password" maxlength="256"></label>
+<button>Sign in</button><p>Use the Supabase account authorized by the project owner. No public account registration is available here.</p></form>
+<section id="admin-content" hidden>
+<nav><button id="admin-refresh">Refresh responses</button><button id="admin-export">Download CSV</button><button id="admin-logout">Sign out</button></nav>
+<p id="admin-stats"></p>
+<p>Goal: at least five classmates outside your project group. Counts use distinct, case-insensitive nicknames and the latest response from each. Eligibility is self-reported, not identity verification. Development tests are excluded from counts and averages, but included and marked in the export.</p>
+<div id="admin-responses"></div></section>
+</main><script type="module" src="/src/feedback/admin.js"></script></body></html>

@@ -12,6 +12,8 @@ import { createPolish } from "./Polish.js";
 
 export class Battlefield {
   constructor(scene) {
+    this.generated = new THREE.Group();
+    scene.add(this.generated);
     this.ground = createTerrain(scene);
     const statics = new THREE.Group();
     scene.add(statics);
@@ -69,6 +71,13 @@ export class Battlefield {
     const animatePolish = createPolish(scene, statics);
     this.animate = time => { animateRegions(time); animatePolish(time); };
     batchScenery(statics);
+  }
+  setGeneratedObstacles(obstacles) {
+    for (const child of [...this.generated.children]) {
+      child.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
+      this.generated.remove(child);
+    }
+    for (const obstacle of obstacles) createWall(this.generated, obstacle);
   }
   plane(parent, x, z, width, depth, color, y) {
     const mesh = new THREE.Mesh(

@@ -1,0 +1,30 @@
+#give-feedback { background:#d6b970; color:#1c3033; font-weight:bold; }
+#feedback-dialog { color:#eee6ce; background:#203437; border:1px solid #c6b17b; border-radius:10px; padding:24px; width:min(580px,calc(100vw - 24px)); max-height:90dvh; overflow:auto; }
+#feedback-dialog::backdrop { background:#071618cc; }
+#feedback-dialog h2 { margin:0 0 12px; }
+#feedback-dialog p { font-size:14px; line-height:1.5; }
+#feedback-dialog label { display:block; font-size:15px; line-height:1.4; margin:16px 0; }
+#feedback-dialog input,#feedback-dialog select,#feedback-dialog textarea { display:block; width:100%; margin-top:6px; padding:10px; font:inherit; color:#f7f2de; background:#152629; border:1px solid #87948a; border-radius:4px; }
+#feedback-dialog textarea { resize:vertical; }
+#feedback-dialog button { min-height:44px; }
+#feedback-dialog .feedback-trap { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+.feedback-actions { display:flex; gap:8px; flex-wrap:wrap; }
+#feedback-status { font-weight:bold; }
+#feedback-invite { margin-top:16px; border-top:1px solid #8a825f; padding-top:12px; }
+#feedback-invite p { font-size:16px; }
+#guided-tutorial { position:fixed; inset:0; z-index:1600; pointer-events:none; }
+.tutorial-spot { position:fixed; border:3px solid #f5d780; border-radius:5px; box-shadow:0 0 0 100vmax #071718a8; pointer-events:none; }
+.tutorial-tip { position:fixed; pointer-events:auto; background:#203437; border:1px solid #d6b970; color:#fff4d5; padding:14px; border-radius:8px; box-sizing:border-box; max-height:55dvh; overflow:auto; }
+.tutorial-tip p { font-size:15px; line-height:1.45; margin:8px 0 12px; }
+.tutorial-tip small { color:#e9cb85; }
+.tutorial-tip button { min-height:40px; margin:3px; }
+.tutorial-target { outline:3px solid #f5d780; outline-offset:2px; }
+@media (prefers-reduced-motion:reduce) { #guided-tutorial *,#feedback-dialog * { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+@media(max-width:600px) { #feedback-dialog { padding:16px; } .tutorial-tip { font-size:14px; } }
+@media(max-width:600px) {
+  header .brand { display:none; }
+  .header-tools { width:100%; overflow-x:auto; padding:4px; }
+  .header-tools button { flex-shrink:0; min-height:44px; font-size:12px; }
+  #give-feedback { order:-3; }
+  #restart-tutorial { order:-2; }
+}

@@ -7,9 +7,12 @@
     "test": "node --test",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:playtesting": "node scripts/verify-playtesting.mjs"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.6.0",
+    "playwright": "^1.65.1",
     "vite": "^8.3.0"
   },
   "dependencies": {

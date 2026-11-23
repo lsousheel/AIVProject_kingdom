@@ -68,6 +68,7 @@ export class Game {
     this.placementArmed = false;
     this.message =
       "Formation ready. Click Start War, select a group, then hold left mouse and drag to draw its route. Reposition is optional.";
+    this.onAction?.('deploy');
     return true;
   }
   invalidateDeployment() {
@@ -89,6 +90,7 @@ export class Game {
     this.placementArmed = false;
     this.message =
       "War started — select a group, then hold left mouse and drag on the ground to trace your route. Release to follow it. All groups selects the whole army.";
+    this.onAction?.('start');
     return true;
   }
   compareRoutes() {
@@ -152,6 +154,7 @@ export class Game {
     const group = this.blue.members(this.blue.selectedGroup);
     if (!group.length) return false;
     for (const soldier of group) soldier.looseRanks = loose;
+    this.onAction?.('spacing');
     return true;
   }
   command(destination, { attackMove = false, trace = null } = {}) {
@@ -169,6 +172,7 @@ export class Game {
     this.message = path
       ? `${this.blue.selectedGroup === "all" ? "All groups" : this.blue.selectedGroup}: ${trace ? "following your sketch with A* detours around obstacles" : attackMove ? "advancing and engaging enemies" : "moving to your marker; combat resumes on arrival"}.${path.adjustedDestination ? " Destination adjusted to the nearest reachable ground." : ""}`
       : "No reachable destination for this group. Your previous order is unchanged.";
+    if (path) this.onAction?.('move');
     return path;
   }
   update(dt) {

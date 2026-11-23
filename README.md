@@ -8,6 +8,9 @@ A browser-based 3D army battle simulator built for a computer graphics / visual 
 
 ## Features
 
+- Guided controls tutorial with spotlights, real-action progression, Skip and restart.
+- Private playtesting feedback, Supabase-backed storage, and owner-only CSV export after configuration. See [the exact setup and verification steps](docs/PLAYTESTING_SETUP.md). Feedback collection is not ready until Supabase and Vercel environment variables are configured.
+
 - Warriors, Berserkers, and Guards with different route preferences and combat statistics.
 - Instant formation previews and independent orders for each soldier category.
 - Freehand route guidance with obstacle detours calculated by A*.
@@ -18,7 +21,7 @@ A browser-based 3D army battle simulator built for a computer graphics / visual 
 
 ## Run locally in VS Code
 
-Install Node.js **20.19+ within Node 20, or 22.12+**, with npm. Use a desktop browser with WebGL support. No backend, database, API keys, or environment variables are required.
+Install Node.js **20.19+ within Node 20, or 22.12+**, with npm. Use a desktop browser with WebGL support. The game runs without credentials. Persistent feedback and the private admin page require the Supabase/Vercel setup described in [PLAYTESTING_SETUP.md](docs/PLAYTESTING_SETUP.md).
 
 For a fresh checkout:
 
@@ -41,6 +44,14 @@ If you already have the project, open its folder in VS Code and run `npm ci` and
 
 ## First battle
 
+### Generate a battlefield
+
+During preparation, expand **Level generator** in the left panel. Choose **Scattered barriers** (up to 8 added walls) or **Fortified approaches** (up to 16), enter a seed, and click **Generate**. **Surprise me** chooses a new seed; reuse a seed and layout to reproduce the additions. **Restore original map** removes them.
+
+The generator adds stone barriers between the river and castle using the existing visual style. It updates collision cells, clearance and debug overlays from the same obstacle data. It keeps structures, staging and defender positions clear, and checks connectivity to the keep approach and demo endpoints before accepting additions. All three soldier categories plan around the new barriers.
+
+Choose troops as usual and start the war. Generating preserves your preparation roster; generation controls lock during a battle or demo. Reset retains the chosen map so you can retry it. Reloading the page returns to the original map. This is a variation generator, not a full terrain editor: river crossings and the castle stay fixed, and seed connectivity does not guarantee that every crowded battle is jam-free.
+
 **Assignment 5 Beta:** During battle, select a class or all groups and change **March spacing** in the left panel. Loose ranks notice nearby teammates farther away and pull together less strongly. Changing the order keeps the current route and destination. Route-following still takes priority on sketches and near obstacles. Select Standard ranks to restore the class defaults.
 
 Download the [tested Beta build](releases/kingdom-wars-beta.zip). Extract it and serve the extracted folder as the site root with any static HTTP server (for example, run `npx serve .` inside the extracted folder).
@@ -55,7 +66,7 @@ Download the [tested Beta build](releases/kingdom-wars-beta.zip). Extract it and
 
 ## Deployment
 
-The game is live at **https://kingdom-wars-theta.vercel.app/**. To deploy your own copy on Vercel, import the GitHub repository, choose the **Vite** preset, use `npm run build` as the build command, and set the output directory to `dist`. No environment variables are needed.
+The game website is **https://kingdom-wars-theta.vercel.app/**. To deploy your copy on Vercel, import the repository, choose the **Vite** preset, use `npm run build` and output `dist`. Include the root `api/` and `server/` folders; deploying only the static build does not provide feedback storage. Follow [the Supabase and admin setup](docs/PLAYTESTING_SETUP.md) before collecting reviews. The hosted feedback feature has not yet been verified.
 
 The production build has a non-blocking size advisory for the JavaScript chunk containing Three.js.
 
@@ -276,7 +287,7 @@ Keep world size divisible by cell size. If obstacles are changed dynamically, re
 
 ## Validation and limits
 
-`npm test` passes all **46 tests** (verified November 12, 2026). Coverage includes briefing and camera transitions, algorithm demos, metrics, class selection, and these gameplay checks: automatic formation display, soft sketch guidance, loop prevention, A* obstacle detours, river crossings and endpoint adjustment, stable defender orders, pursuit progress, line-of-sight grace, manual battle start/Red response and class-specific combat disengagement, river occupancy, bridge compression/re-expansion, swarm-lab restoration, discounted-road optimality, scenery construction, original navigation regressions, profile route differences, clearance preference, group-isolated orders, both armies completing profile routes, local Boids stability, placement, fixed defenders, state locking, health/death, and complete victories/defeats. See `docs/VALIDATION.md` for measured results and browser checks.
+`npm test` passes all **55 tests** (verified November 23, 2026). Coverage includes briefing and camera transitions, algorithm demos, metrics, class selection, and these gameplay checks: automatic formation display, soft sketch guidance, loop prevention, A* obstacle detours, river crossings and endpoint adjustment, stable defender orders, pursuit progress, line-of-sight grace, manual battle start/Red response and class-specific combat disengagement, river occupancy, bridge compression/re-expansion, swarm-lab restoration, discounted-road optimality, scenery construction, original navigation regressions, profile route differences, clearance preference, group-isolated orders, both armies completing profile routes, local Boids stability, placement, fixed defenders, state locking, health/death, and complete victories/defeats. See `docs/VALIDATION.md` for measured results and browser checks.
 
 Current limits:
 - Balance is illustrative. The tested 30-Berserker southern flank attack wins; a direct approach can lose. No claim of competitive balance is made. Survivors separated by walls may require another player order.

@@ -37,6 +37,14 @@ export class UIManager {
       <header><div class="brand"><span class="crest">♜</span><div><small>THE SIEGE OF RED KEEP</small><h1>KINGDOM WARS</h1></div></div>
       <div class="header-tools"><button id="focus">Focus army</button><button id="battleView">Battle view</button><button id="castle">Red keep</button><button id="home">Overview</button><button id="algorithmView" aria-pressed="false">Algorithm View</button><span id="phase" class="phase-badge">PREPARATION</span></div></header>
       <aside>
+        <details id="level-generator"><summary>LEVEL GENERATOR</summary>
+          <p class="muted">Add stone barriers to the battlefield. The same seed and layout recreate the same level.</p>
+          <label for="level-seed">Seed (0–999999)</label><input id="level-seed" type="number" min="0" max="999999" step="1" value="42">
+          <label for="level-density">Layout</label><select id="level-density"><option value="scattered">Scattered barriers</option><option value="fortified">Fortified approaches</option></select>
+          <div class="button-pair"><button id="generate-level">Generate</button><button id="random-level">Surprise me</button></div>
+          <button id="original-level">Restore original map</button>
+          <p id="level-name" class="muted">Original battlefield</p>
+        </details>
         <small>ENEMY INTELLIGENCE</small><h2>Break the defense.</h2><p class="muted">Defeat the Red army to take the keep. Study the approaches before committing.</p>
         <div class="enemy-roster"><strong>${compositionTotal(RED_COMPOSITION)}</strong><div>RED DEFENDERS<span>${RED_COMPOSITION.warrior} Warriors · ${RED_COMPOSITION.berserker} Berserkers · ${RED_COMPOSITION.guard} Guards</span></div></div>
         <div class="defense-notes"><span>Warriors <b>Middle line</b></span><span>Berserkers <b>Southern flank</b></span><span>Guards <b>Castle entrance</b></span></div>
@@ -113,6 +121,18 @@ export class UIManager {
       "replay",
     ])
       document.getElementById(id).onclick = actions[id];
+    const buildLevel = (random = false) => {
+      if (game.phase !== 'PREPARATION') return;
+      const input = document.getElementById('level-seed');
+      if (random) input.value = Math.floor(Math.random()*1000000);
+      if (!input.value || !input.reportValidity()) return;
+      actions.generateLevel(Number(input.value), document.getElementById('level-density').value);
+    };
+    document.getElementById('generate-level').onclick = () => buildLevel();
+    document.getElementById('random-level').onclick = () => buildLevel(true);
+    document.getElementById('original-level').onclick = () => {
+      if (game.phase === 'PREPARATION') actions.originalLevel();
+    };
     document.getElementById("balanced").onclick = () => {
       if (game.phase !== "PREPARATION") return;
       game.composition = { ...DEFAULT_COMPOSITION };
@@ -148,6 +168,7 @@ export class UIManager {
       game.invalidateDeployment();
       actions.preview();
       this.update();
+      game.onAction?.('formation');
     };
     for (const id of [
       ...Object.keys(PATH_PROFILES),
@@ -176,6 +197,10 @@ export class UIManager {
       prep = g.phase === "PREPARATION",
       blue = g.blue?.active ?? [],
       total = compositionTotal(g.composition);
+    for (const id of ['level-seed', 'level-density', 'generate-level', 'random-level', 'original-level'])
+      document.getElementById(id).disabled = !prep;
+    document.getElementById('level-name').textContent = (g.levelName ?? 'Original battlefield')
+      + (prep ? '' : ' · Reset to change the level');
     document.getElementById("phase").textContent = g.paused
       ? "PAUSED"
       : g.phase === "DEMONSTRATION"

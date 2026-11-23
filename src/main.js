@@ -15,6 +15,9 @@ import { RTSCamera } from "./camera/RTSCamera.js";
 import { DebugVisualizer } from "./navigation/DebugVisualizer.js";
 import { DEMO_PRESETS } from './systems/DemoPresets.js';
 import { IntroSequence } from './intro/IntroSequence.js';
+import { generateLevel, levelGrid } from './world/LevelGenerator.js';
+import { Tutorial } from './onboarding/Tutorial.js';
+import { Feedback } from './feedback/Feedback.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xc6c4ae);
@@ -65,6 +68,8 @@ const reset = () => {
   document.querySelector("aside").scrollTop = 0;
 };
 const ui = new UIManager(game, {
+  generateLevel: (seed, density) => changeLevel(generateLevel(seed, density)),
+  originalLevel: () => changeLevel({ grid: levelGrid(), obstacles: [] }),
   preview: () => {
     sample = game.blue?.active[0] ?? null;
     if (game.blue) rts.focusPoint(game.blue.center, 0.55);
@@ -130,6 +135,20 @@ const ui = new UIManager(game, {
     debug.flags[id] = on;
   },
 });
+function changeLevel(level) {
+  if (game.phase !== 'PREPARATION') return;
+  Object.assign(grid, level.grid);
+  field.setGeneratedObstacles(level.obstacles);
+  debug.refreshGrid();
+  game.previewPaths = null;
+  game.invalidateDeployment();
+  game.levelName = level.seed == null ? 'Original battlefield'
+    : `Seed ${level.seed} · ${level.density} · ${level.obstacles.length} barriers`;
+  game.message = 'Battlefield ready. Choose troops and Start War.';
+  sample = game.blue?.active[0] ?? null;
+  rts.reset();
+  ui.update();
+}
 function selectType(type) {
   if (
     !["PREPARATION", "BATTLE", "DEMONSTRATION"].includes(game.phase) ||
@@ -137,6 +156,7 @@ function selectType(type) {
   )
     return;
   game.blue.setSelected(true, type);
+  game.onAction?.('select');
   sample = game.blue.members(type)[0];
   rts.focusPoint(game.blue.centerOf(game.blue.members(type)), 0.48);
   game.message = game.phase === 'PREPARATION'
@@ -231,7 +251,7 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
       let object = hit.object;
       while (object && !object.userData.soldier) object = object.parent;
       sample = object?.userData.soldier;
-      if (sample) game.blue.setSelected(true, sample.unitType);
+      if (sample) { game.blue.setSelected(true, sample.unitType); game.onAction?.('select'); }
     }
     if (ground && game.blue.selected && ["BATTLE", "DEMONSTRATION"].includes(game.phase)) {
       drawing = { points: [ground.point.clone()], x: e.clientX, y: e.clientY, dragged: false, hit: Boolean(hit) };
@@ -286,6 +306,9 @@ let intro;
 window.addEventListener("resize", () => resize(intro?.active));
 resize();
 intro = new IntroSequence({ game, rts, canvas: renderer.domElement, onLayout: resize });
+const tutorial = new Tutorial({game,intro});
+const feedback = new Feedback({game,tutorial,rts});
+game.onAction = name => tutorial.action(name);
 let last = performance.now(),
   accumulator = 0,
   uiTimer = 0,
@@ -295,9 +318,11 @@ function frame(now) {
   const dt = Math.min((now - last) / 1000, 0.1);
   last = now;
   if (intro.active) intro.update(dt);
-  else rts.update(dt);
+  else if (!feedback.active) rts.update(dt);
+  tutorial.update(feedback.active);
+  feedback.update();
   field.animate(now / 1000);
-  accumulator = intro.active ? 0 : accumulator + dt;
+  accumulator = intro.active || feedback.active || tutorial.holding ? 0 : accumulator + dt;
   while (accumulator >= 1 / 60) {
     game.update(1 / 60);
     accumulator -= 1 / 60;

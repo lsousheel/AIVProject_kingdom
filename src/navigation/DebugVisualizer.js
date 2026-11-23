@@ -67,6 +67,21 @@ export class DebugVisualizer {
     this.signature = "";
     this.emptyPaths = {};
   }
+  refreshGrid() {
+    this.scene.remove(this.blocked);
+    this.blocked.geometry.dispose();
+    this.blocked.material.dispose();
+    this.blocked.dispose();
+    const points = [];
+    for (let z=0; z<this.grid.count; z++)
+      for (let x=0; x<this.grid.count; x++)
+        if (!this.grid.walkable(x,z)) points.push(this.grid.toWorld({x,z}));
+    this.blocked = this.cells(points, 0xe47562, 0.4);
+    this.scene.add(this.blocked);
+    this.clear(this.paths);
+    this.clear(this.visited);
+    this.signature = '';
+  }
   cells(points, color, opacity) {
     const mesh = new THREE.InstancedMesh(
       new THREE.PlaneGeometry(
