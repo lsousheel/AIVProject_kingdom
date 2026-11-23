@@ -52,7 +52,7 @@ try{
  const p=await player.newPage();await ready(p);await step(p,'objective');
  await p.locator('#tutorial-next').click();await step(p,'troops');
  await p.waitForTimeout(200);assert.equal(await p.locator('#tutorial-next').isVisible(),false);
- await p.locator('#balanced').click();await step(p,'formation');
+ await p.locator('#balanced').click();await step(p,'troops');await p.locator('#tutorial-next').click();await step(p,'formation');
  await p.locator('#formation').selectOption('wide');await step(p,'start');
  await p.locator('#start').click();await step(p,'select');
  await p.locator('[data-type="warrior"]').click();await step(p,'move');
@@ -96,7 +96,7 @@ try{
  const bounds=await p.locator('#feedback-dialog').boundingBox();assert.ok(bounds.x>=0&&bounds.x+bounds.width<=391);
  await p.locator('#close-feedback').click();
  await p.setViewportSize({width:1440,height:900});
- await p.locator('#restart-tutorial').click();await p.locator('#tutorial-next').click();await p.locator('#balanced').click();
+ await p.locator('#restart-tutorial').click();await p.locator('#tutorial-next').click();await p.locator('#balanced').click();await p.locator('#tutorial-next').click();
  await p.screenshot({path:'tmp/verification/tutorial-formation.png'});
  const [spot,target]=await Promise.all([p.locator('.tutorial-spot').boundingBox(),p.locator('#formation').boundingBox()]);
  assert.ok(Math.abs(spot.x-target.x)<2);

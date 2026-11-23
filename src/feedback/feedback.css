@@ -28,3 +28,5 @@
   #give-feedback { order:-3; }
   #restart-tutorial { order:-2; }
 }
+
+#tutorial-skip { display:block; width:100%; border:1px solid #e9cb85; color:#fff4d5; margin:10px 0 0; }

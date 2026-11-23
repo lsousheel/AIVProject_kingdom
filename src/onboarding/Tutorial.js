@@ -1,12 +1,12 @@
 export const TUTORIAL_KEY = 'kingdom-wars-tutorial-v1';
 export const STEPS = [
-  ['objective','#field-status','Defeat all Red defenders to win. Choose your army, then give it orders.',''],
-  ['troops','.troop-cards','Choose troops using these cards. You can add up to 30 soldiers.','deploy'],
-  ['formation','#formation','Choose a formation. It changes where your troops stand before battle.','formation'],
+  ['objective','#field-status','Defeat every Red defender. Choose your Blue army, then start the battle and guide your groups. Prefer to explore? Skip tutorial below. Help / Tutorial brings this guide back anytime.',''],
+  ['troops','.troop-bar','Click a troop card to add ONE soldier of that type. Click its minus button to remove one. Each card shows that group’s size; your total limit is 30. Balanced 30 gives you 10 of each type. Keep adjusting, then choose Army ready below.','deploy'],
+  ['formation','#formation','Choose how your army stands: Compact block keeps it together; Line spreads it into a line; Wide ranks gives it more width. Troops appear automatically, without clicking Deploy. Change this menu to try a formation.','formation'],
   ['start','#start','Click Start War. Your troops will wait for your orders.','start'],
-  ['select','.troop-cards','Select a troop class to command that group. You can also use 1, 2 or 3.','select'],
-  ['move','#battlefield','Right-click open ground to move your selected troops. You can also click or drag a route on the ground.','move'],
-  ['spacing','#rank-spacing','Choose Loose ranks to give soldiers more space, or switch back to Standard ranks.','spacing'],
+  ['select','.troop-cards','Click a troop card to SELECT that whole group. During battle, cards select soldiers instead of adding them. You can also press 1, 2 or 3. Select Warriors if you brought them, or another available group.','select'],
+  ['move','#battlefield','Draw a route: 1. Select a troop group. 2. Hold the LEFT mouse button on open ground near them and drag the route you want. 3. Release at your destination to send the order. On touch screens, press and drag the ground. Your sketch is a guide: soldiers find a way around obstacles. For a quick automatic route, right-click the destination.','move'],
+  ['spacing','#rank-spacing','Try Loose ranks to give soldiers more room, or Standard to keep them closer. Strategy tip: send one group across a narrow bridge first, then order the next. Draw separate routes when crossings are available. Spacing helps, but cannot make a narrow bridge wider.','spacing'],
   ['pause','#pause','Pause stops the battle. Click it again to resume. Space also pauses when you are not typing.',''],
   ['camera','#home','Use WASD or arrow keys to move the camera and scroll to zoom. Overview brings the whole map back into view.',''],
   ['inspector','#algorithmView','Algorithm View shows how A* chooses routes and Boids steers nearby soldiers. You can open it during play.',''],
@@ -25,7 +25,7 @@ export class Tutorial {
     document.querySelector('.header-tools').append(this.help);
     this.help.onclick=()=>this.start();
     this.root=document.createElement('div');this.root.id='guided-tutorial';this.root.hidden=true;
-    this.root.innerHTML='<div class="tutorial-spot" aria-hidden="true"></div><section class="tutorial-tip" role="region" aria-label="Guided tutorial"><small id="tutorial-progress"></small><p id="tutorial-text" aria-live="polite"></p><div><button id="tutorial-next">Next</button><button id="tutorial-resume" hidden>Resume battle</button><button id="tutorial-focus">Focus highlighted control</button><button id="tutorial-skip">Skip tutorial</button></div></section>';
+    this.root.innerHTML='<div class="tutorial-spot" aria-hidden="true"></div><section class="tutorial-tip" role="region" aria-label="Guided tutorial"><small id="tutorial-progress"></small><p id="tutorial-text" aria-live="polite"></p><div><button id="tutorial-next">Next</button><button id="tutorial-resume" hidden>Resume battle</button><button id="tutorial-focus">Focus highlighted control</button><button id="tutorial-skip">Skip tutorial — play freely</button></div></section>';
     document.body.append(this.root);
     this.tip=this.root.querySelector('.tutorial-tip');this.spot=this.root.querySelector('.tutorial-spot');
     this.root.querySelector('#tutorial-next').onclick=()=>this.advance();
@@ -43,7 +43,7 @@ export class Tutorial {
   start() {
     if(this.intro.active) {this.autoPending=true;return;}
     if(this.game.phase==='DEMONSTRATION') {this.game.exitDemo();}
-    this.autoPending=false;this.active=true;this.index=ended(this.game.phase)?10:0;
+    this.troopsChanged=false;this.autoPending=false;this.active=true;this.index=ended(this.game.phase)?10:0;
     this.state={status:'in_progress',step:STEPS[this.index][0]};this.save();
     this.root.hidden=false;
     for(const [el,handler] of this.buttons)el.onclick=handler;
@@ -65,10 +65,12 @@ export class Tutorial {
   }
   action(name) {
     if(!this.active || this.suspended || this.intro.active || this.game.phase==='DEMONSTRATION') return;
+    if(STEPS[this.index][0]==='troops' && name==='deploy') {this.troopsChanged=true;this.render();return;}
     if(STEPS[this.index][3]===name) this.advance();
   }
   advance() {
     if(!this.active) return;
+    if(this.index===1 && (!this.troopsChanged || !this.game.blue?.active.length)) return;
     if(this.index===10) {
       if(ended(this.game.phase)) this.finish('completed');
       return;
@@ -85,8 +87,9 @@ export class Tutorial {
     const waiting=id==='result'&&!ended(this.game.phase);
     this.root.querySelector('#tutorial-text').textContent=waiting
       ? 'Keep playing. At the result screen we will show Replay and Give Feedback. You can give feedback now using the toolbar, even if you get stuck.' : text;
-    this.root.querySelector('#tutorial-next').hidden=!!event||waiting;
-    this.root.querySelector('#tutorial-next').textContent=id==='result'?'Finish tutorial':'Next';
+    const armyReady=id==='troops'&&this.troopsChanged&&!!this.game.blue?.active.length;
+    this.root.querySelector('#tutorial-next').hidden=(!!event&&!armyReady)||waiting;
+    this.root.querySelector('#tutorial-next').textContent=id==='result'?'Finish tutorial':id==='troops'?'Army ready — choose formation':'Next';
     this.root.querySelector('#tutorial-focus').hidden=waiting;
     if(!waiting) {
       this.target=document.querySelector(selector);
